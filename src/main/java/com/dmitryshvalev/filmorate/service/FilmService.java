@@ -4,7 +4,6 @@ import com.dmitryshvalev.filmorate.model.Film;
 import com.dmitryshvalev.filmorate.storage.film.FilmStorage;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -17,8 +16,8 @@ public class FilmService {
         this.filmStorage = filmStorage;
     }
 
-    public void like(int id, int postId) {
-        filmStorage.like(id, postId);
+    public void like(int userId, int filmId) {
+        filmStorage.like(userId, filmId);
     }
 
     public void dislike(int id, int postId) {
@@ -41,7 +40,7 @@ public class FilmService {
         return filmStorage.update(film);
     }
 
-    public List<Film> top10PopularFilmsByLikes() {
-        return filmStorage.top10PopularFilmsByLikes();
+    public List<Film> popular(int count) {
+        return filmStorage.popular(count);
     }
 }

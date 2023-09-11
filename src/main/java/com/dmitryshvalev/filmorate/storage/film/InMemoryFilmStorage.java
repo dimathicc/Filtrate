@@ -49,9 +49,9 @@ public class InMemoryFilmStorage implements FilmStorage {
         return updatedFilm;
     }
 
-    public void like(int id, int postId) {
-        films.get(postId).getLikes().add(id);
-        userStorage.findUserById(id).getLikes().add(postId);
+    public void like(int userId, int filmId) {
+        films.get(filmId).getLikes().add(id);
+        userStorage.findUserById(userId).getLikes().add(filmId);
     }
 
     public void dislike(int id, int postId) {
@@ -60,10 +60,10 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public List<Film> top10PopularFilmsByLikes() {
+    public List<Film> popular(int count) {
         List<Film> sortedFilms = new ArrayList<>(films.values());
         sortedFilms.sort(Collections.reverseOrder());
-        return sortedFilms.subList(0,10);
+        return sortedFilms.subList(0, count);
     }
 
 
