@@ -1,50 +1,59 @@
 package com.dmitryshvalev.filmorate.controller;
 
 import com.dmitryshvalev.filmorate.model.Film;
-import com.dmitryshvalev.filmorate.util.ValidationException;
+import com.dmitryshvalev.filmorate.service.FilmService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/films")
 @Slf4j
 public class FilmController {
 
-    private final List<Film> films = new ArrayList<>();
+    private final FilmService filmsService;
+
+    public FilmController(FilmService filmsService) {
+        this.filmsService = filmsService;
+    }
+
 
     @GetMapping
-    public List<Film> findAll() {
-        return films;
+    public Map<Integer, Film> findAll() {
+        return filmsService.findAll();
     }
 
     @PostMapping("/add")
     public Film add(@Valid @RequestBody Film film) {
-        validateFilm(film);
-        films.add(film);
-        log.info("Film {} was added", film.getName());
-        return film;
+        return filmsService.add(film);
+    }
+
+    @PostMapping("/delete/{id}")
+    public Film delete(@PathVariable int id) {
+        return filmsService.delete(id);
     }
 
     @PutMapping("/update")
-    public Film update(@Valid @RequestBody Film updatedFilm) {
-        validateFilm(updatedFilm);
-        films.add(updatedFilm.getId(), updatedFilm);
-        log.info("Film {} was updated", updatedFilm.getName());
-        return updatedFilm;
+    public Film update(@Valid @RequestBody Film film) {
+        return filmsService.update(film);
     }
 
-    private void validateFilm(Film film) {
-        if (film.getName().isEmpty()) {
-            throw new ValidationException("Name shouldn't be empty");
-        } else if (film.getDescription().length() >= 200) {
-            throw new ValidationException("Description shouldn't be longer than 200 letters");
-        } else if (film.getReleaseDate().before(new Date("28-12-1895"))) {
-            throw new ValidationException("Date should be before 28 Dec 1895");
-        }
+    @GetMapping("/top")
+    public List<Film> top10PopularFilmsByLikes() {
+        return filmsService.top10PopularFilmsByLikes();
     }
+
+    @PostMapping("/{postId}/{id}/like")
+    public void like(@PathVariable int id, @PathVariable int postId) {
+        filmsService.like(id, postId);
+    }
+
+    @PostMapping("/{postId}/{id}/dislike")
+    public void dislike(@PathVariable int id, @PathVariable int postId) {
+        filmsService.dislike(id, postId);
+    }
+
 }

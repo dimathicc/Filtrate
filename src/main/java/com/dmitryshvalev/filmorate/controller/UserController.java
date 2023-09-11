@@ -1,52 +1,64 @@
 package com.dmitryshvalev.filmorate.controller;
 
 import com.dmitryshvalev.filmorate.model.User;
-import com.dmitryshvalev.filmorate.util.ValidationException;
+import com.dmitryshvalev.filmorate.service.UserService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/users")
 @Slf4j
 public class UserController {
 
-    private final List<User> users = new ArrayList<>();
+    private final UserService userService;
+
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
+
 
     @GetMapping
-    public List<User> findAll() {
-        return users;
+    public Map<Integer, User> findAll() {
+        return userService.findAll();
+    }
+
+    @GetMapping("/{id}")
+    public User findUserById(@PathVariable int id) {
+        return userService.findUserById(id);
     }
 
     @PostMapping("/add")
     public User add(@Valid @RequestBody User user) {
-        validateUser(user);
-        users.add(user);
-        log.info("User {} was added", user.getLogin());
-        return user;
+        return userService.add(user);
+    }
+
+    @DeleteMapping("/{id}/delete")
+    public User delete(@PathVariable int id) {
+        return userService.delete(id);
     }
 
     @PutMapping("/update")
-    public User update(@Valid @RequestBody User updatedUser) {
-        validateUser(updatedUser);
-        users.add(updatedUser.getId(), updatedUser);
-        log.info("User {} updated", updatedUser.getLogin());
-        return updatedUser;
+    public User update(@Valid @RequestBody User user) {
+        return userService.update(user);
     }
 
-    public void validateUser(User user) {
-        if (user.getEmail().isEmpty() || !user.getEmail().contains("@")) {
-            throw new ValidationException("Email validation failed");
-        } else if (user.getLogin().isEmpty() || user.getLogin().contains(" ")) {
-            throw new ValidationException("Login validation failed");
-        } else if (user.getName().isEmpty()) {
-            user.setName(user.getLogin());
-        } else if (user.getBirthday().isAfter(LocalDate.now()))
-            throw new ValidationException("Birthday validation failed");
+    @PostMapping("/{id}/{userId}/addFriend")
+    public void addFriend(@PathVariable int id, @PathVariable int userId) {
+        userService.addFriend(id, userId);
+    }
+
+    @PostMapping("/{id}/removeFriend/{friendId}")
+    public void removeFromFriends(@PathVariable int id, @PathVariable int friendId) {
+        userService.removeFromFriends(id, friendId);
+    }
+
+    @GetMapping("/{userId}/showFriends")
+    public Set<Integer> showAllFriends(@PathVariable int userId) {
+        return userService.showAllFriends(userId);
     }
 
 }
