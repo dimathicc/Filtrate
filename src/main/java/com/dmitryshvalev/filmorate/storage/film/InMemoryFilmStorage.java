@@ -66,7 +66,6 @@ public class InMemoryFilmStorage implements FilmStorage {
         return sortedFilms.subList(0, count);
     }
 
-
     private void validateFilm(Film film) {
         if (film.getName().isEmpty()) {
             throw new ValidationException("Name shouldn't be empty");

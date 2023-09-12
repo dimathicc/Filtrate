@@ -1,9 +1,7 @@
 package com.dmitryshvalev.filmorate.storage.user;
 
 import com.dmitryshvalev.filmorate.model.User;
-import org.springframework.stereotype.Component;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
