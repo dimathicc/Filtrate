@@ -6,6 +6,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,6 +31,7 @@ public class FilmController {
         return filmsService.create(film);
     }
 
+    @Cacheable("allFilms")
     @GetMapping
     public List<Film> findAll() {
         return filmsService.findAllFilms();
@@ -40,6 +42,7 @@ public class FilmController {
         return filmsService.update(film);
     }
 
+    @Cacheable("filmById")
     @GetMapping("/{id}")
     public Film findFilmById(@PathVariable("id") int id) {
         return filmsService.findFilmById(id);
@@ -55,6 +58,7 @@ public class FilmController {
         filmsService.removeLike(id, userId);
     }
 
+    @Cacheable("popularFilms")
     @GetMapping("/popular")
     public List<Film> findPopular(@RequestParam(defaultValue = "10") @Positive int count) {
         return filmsService.findPopular(count);

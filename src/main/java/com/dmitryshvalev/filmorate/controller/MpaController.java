@@ -3,6 +3,7 @@ package com.dmitryshvalev.filmorate.controller;
 import com.dmitryshvalev.filmorate.model.Mpa;
 import com.dmitryshvalev.filmorate.service.FilmService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,6 +21,7 @@ public class MpaController {
         this.filmService = filmService;
     }
 
+    @Cacheable("allMpa")
     @GetMapping
     public List<Mpa> findAllMpa() {
         return filmService.findAllMpa();

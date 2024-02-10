@@ -4,6 +4,7 @@ import com.dmitryshvalev.filmorate.model.User;
 import com.dmitryshvalev.filmorate.service.UserService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -32,11 +33,13 @@ public class UserController {
         return user;
     }
 
+    @Cacheable("allUsers")
     @GetMapping
     public List<User> findAll() {
         return userService.findAll();
     }
 
+    @Cacheable("userById")
     @GetMapping("/{id}")
     public User findUserById(@PathVariable("id") int id) {
         return userService.findUserById(id);

@@ -3,6 +3,7 @@ package com.dmitryshvalev.filmorate.controller;
 import com.dmitryshvalev.filmorate.model.Genre;
 import com.dmitryshvalev.filmorate.service.FilmService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,6 +21,7 @@ public class GenreController {
         this.filmService = filmService;
     }
 
+    @Cacheable("allGenres")
     @GetMapping
     public List<Genre> findAllGenres() {
         return filmService.findAllGenres();
