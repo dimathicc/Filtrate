@@ -6,59 +6,59 @@ import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+@Slf4j
 @RestController
 @RequestMapping("/users")
-@Slf4j
 public class UserController {
-
     private final UserService userService;
 
     public UserController(UserService userService) {
         this.userService = userService;
     }
 
+    @PostMapping
+    public User create(@Valid @RequestBody User user) {
+        userService.create(user);
+        return user;
+    }
+
+    @PutMapping
+    public User update(@Valid @RequestBody User user) {
+        userService.update(user);
+        return user;
+    }
 
     @GetMapping
-    public Map<Integer, User> findAll() {
+    public List<User> findAll() {
         return userService.findAll();
     }
 
     @GetMapping("/{id}")
-    public User findUserById(@PathVariable int id) {
+    public User findUserById(@PathVariable("id") int id) {
         return userService.findUserById(id);
     }
 
-    @PostMapping("/add")
-    public User add(@Valid @RequestBody User user) {
-        return userService.add(user);
-    }
-
-    @DeleteMapping("/delete/{id}")
-    public User delete(@PathVariable int id) {
-        return userService.delete(id);
-    }
-
-    @PutMapping("/update")
-    public User update(@Valid @RequestBody User user) {
-        return userService.update(user);
-    }
-
-    @PutMapping("/{id}/friends/{userId}")
-    public void addFriend(@PathVariable int id, @PathVariable int userId) {
-        userService.addFriend(id, userId);
+    @PutMapping("/{id}/friends/{friendId}")
+    public void addFriend(@PathVariable("id") int id, @PathVariable("friendId") int friendId) {
+        userService.addFriend(id, friendId);
     }
 
     @DeleteMapping("/{id}/friends/{friendId}")
-    public void removeFromFriends(@PathVariable int id, @PathVariable int friendId) {
-        userService.removeFromFriends(id, friendId);
+    public void removeFriend(@PathVariable("id") int id, @PathVariable("friendId") int friendId) {
+        userService.removeFriend(id, friendId);
     }
 
-    @GetMapping("/{userId}/friends")
-    public Set<Integer> showAllFriends(@PathVariable int userId) {
-        return userService.showAllFriends(userId);
+    @GetMapping("/{id}/friends")
+    public List<User> findAllFriends(@PathVariable("id") int id) {
+        return userService.findAllFriends(id);
     }
 
+    @GetMapping("/{id}/friends/common/{otherId}")
+    public List<User> findCommonFriends(@PathVariable("id") int id, @PathVariable("otherId") int otherId) {
+        return userService.findCommonFriends(id, otherId);
+    }
 }

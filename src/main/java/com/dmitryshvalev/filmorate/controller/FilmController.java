@@ -3,15 +3,19 @@ package com.dmitryshvalev.filmorate.controller;
 import com.dmitryshvalev.filmorate.model.Film;
 import com.dmitryshvalev.filmorate.service.FilmService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
 
+@Validated
+@Slf4j
 @RestController
 @RequestMapping("/films")
-@Slf4j
 public class FilmController {
 
     private final FilmService filmsService;
@@ -21,39 +25,39 @@ public class FilmController {
     }
 
 
+    @PostMapping
+    public Film create(@Valid @RequestBody Film film) {
+        return filmsService.create(film);
+    }
+
     @GetMapping
-    public Map<Integer, Film> findAll() {
-        return filmsService.findAll();
+    public List<Film> findAll() {
+        return filmsService.findAllFilms();
     }
 
-    @PostMapping("/add")
-    public Film add(@Valid @RequestBody Film film) {
-        return filmsService.add(film);
-    }
-
-    @PostMapping("/delete/{id}")
-    public Film delete(@PathVariable int id) {
-        return filmsService.delete(id);
-    }
-
-    @PutMapping("/update")
+    @PutMapping
     public Film update(@Valid @RequestBody Film film) {
         return filmsService.update(film);
     }
 
+    @GetMapping("/{id}")
+    public Film findFilmById(@PathVariable("id") int id) {
+        return filmsService.findFilmById(id);
+    }
+
+    @PutMapping("/{id}/like/{userId}")
+    public void addLike(@PathVariable("id") int id, @PathVariable("userId") int userId) {
+        filmsService.addLike(id, userId);
+    }
+
+    @DeleteMapping("/{id}/like/{userId}")
+    public void removeFilmLike(@PathVariable("id") Integer id, @PathVariable("userId") Integer userId) {
+        filmsService.removeLike(id, userId);
+    }
+
     @GetMapping("/popular")
-    public List<Film> popular(@RequestParam(defaultValue = "10") Integer count) {
-        return filmsService.popular(count);
-    }
-
-    @PutMapping("/{filmId}/like/{userId}")
-    public void like(@PathVariable int userId, @PathVariable int filmId) {
-        filmsService.like(userId, filmId);
-    }
-
-    @DeleteMapping("/{postId}/like/{id}")
-    public void dislike(@PathVariable int id, @PathVariable int postId) {
-        filmsService.dislike(id, postId);
+    public List<Film> findPopular(@RequestParam(defaultValue = "10") @Positive int count) {
+        return filmsService.findPopular(count);
     }
 
 }

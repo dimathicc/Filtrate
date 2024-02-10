@@ -1,50 +1,71 @@
 package com.dmitryshvalev.filmorate.service;
 
+import com.dmitryshvalev.filmorate.exception.UserNotFoundException;
 import com.dmitryshvalev.filmorate.model.User;
-import com.dmitryshvalev.filmorate.storage.user.UserStorage;
+import com.dmitryshvalev.filmorate.storage.FriendStorage;
+import com.dmitryshvalev.filmorate.storage.UserStorage;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+@RequiredArgsConstructor
 @Service
 public class UserService {
-
     private final UserStorage userStorage;
+    private final FriendStorage friendStorage;
 
-    public UserService(UserStorage userStorage) {
-        this.userStorage = userStorage;
-    }
-
-    public Map<Integer, User> findAll() {
+    public List<User> findAll() {
         return userStorage.findAll();
     }
 
-    public User findUserById(int id) {
-        return userStorage.findUserById(id);
-    }
-
-    public User add(User user) {
-        return userStorage.add(user);
-    }
-
-    public User delete(int id) {
-        return userStorage.delete(id);
+    public User create(User user) {
+        validate(user);
+        return userStorage.create(user);
     }
 
     public User update(User user) {
+        validate(user);
+        if (userStorage.findUserById(user.getId()).isEmpty()) {
+            throw new UserNotFoundException("Пользователь не найден.");
+        }
         return userStorage.update(user);
     }
 
-    public void addFriend(int id, int userId) {
-        userStorage.addFriend(id, userId);
+    public User findUserById(int id) {
+        return userStorage.findUserById(id).orElseThrow(() -> new UserNotFoundException("Пользователь не найден"));
     }
 
-    public void removeFromFriends(int id, int friendId) {
-        userStorage.removeFromFriends(id, friendId);
+    public void addFriend(int id, int friendId) {
+        if (userStorage.findUserById(id).isEmpty() || userStorage.findUserById(friendId).isEmpty()) {
+            throw new UserNotFoundException("Пользователь не найден.");
+        }
+        if (id < 0 || friendId < 0) {
+            throw new UserNotFoundException("Пользователь не найден.");
+        }
+        friendStorage.addFriend(id, friendId);
     }
 
-    public Set<Integer> showAllFriends(int id) {
-        return userStorage.showAllFriends(id);
+    public List<User> findAllFriends(int id) {
+        return friendStorage.findAllFriends(id);
+    }
+
+    public List<User> findCommonFriends(int id, int otherId) {
+        return friendStorage.findCommonFriends(id, otherId);
+    }
+
+    public void removeFriend(int id, int friendId) {
+        if (userStorage.findUserById(id).isEmpty() || userStorage.findUserById(friendId).isEmpty()) {
+            throw new UserNotFoundException("Пользователь не найден.");
+        }
+        friendStorage.removeFriend(id, friendId);
+    }
+
+    private void validate(User user) {
+        if (user.getName() == null || user.getName().isBlank()) {
+            user.setName(user.getLogin());
+        }
     }
 }
